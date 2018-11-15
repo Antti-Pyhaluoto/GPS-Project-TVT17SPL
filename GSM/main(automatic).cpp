@@ -1,4 +1,5 @@
 #include "mbed.h"
+#include <string.h>
 //#include "GSM.h"
 
 Serial gsm(D14, D15);
@@ -14,6 +15,7 @@ Timer ajastin;
 char *alku[][2][200] = {
 	{{"AT"},			{"OK"}},		//Varmistetaan että modeemi on päällä
 	{{"AT+CPIN=0000"},	{"Call Ready"}},//Annetaan PIN koodi
+	{{"AT+CMEE=2"},		{"OK"}},		//Virhee kirjallisiksi
 	{{"AT+CGREG?"},		{"+CGREG: 0,1"}},//Varmistetaan että on rekisteröitynyt koti verkkoon.
 	//{{"AT+CGATT=1"},	{"OK"}},		//Kiinnittää GPRS:n
 	//{{"AT+QIMODE=1"},	{"OK"}},		//Aktivoidaan PDP konteksti
@@ -26,9 +28,11 @@ char *alku[][2][200] = {
 char *lahetys[][2][200] = {
 	{{"AT+QIOPEN=\"TCP\",\"193.167.100.74\",80"}, {"CONNECT OK"}},
 	{{"AT+QISEND"}, {">"}},
-	{{"GET /testwifi/index.html HTTP/1.1\nHost: wifitest.adafruit.com\nConnection: close\032"}, {"SEND OK"}}
+	{{"GET /~t5pyan00/indexvanha.html HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032"}, {"SEND OK"}}
+	//{{"GET /~tkorpela/jkaskitesti/vastaanotto.php?testi=SeToimii HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032"}, {"SEND OK"}}
 };
 
+void ledi();
 void lahetaLueLoop(bool alku);
 void lue(int aika);
 void laheta(char *kasky);
@@ -37,7 +41,6 @@ int lahetaJaOdota(char *kasky, char *vastaus, int aika);
 
 int main(){
 	pc.printf("Aloitus. GSM serial pass.\n");
-	//gsm.printf("AT\r");
 	
 	//Ei mennä eteenpäin ennen napin painamista.
 	lahetaLueLoop(true);
@@ -46,6 +49,7 @@ int main(){
 	
 	//Käydään läpi alku komentosarja
 	for(int i = 0; i < l - 1; i++){
+		ledi();
 		int j = lahetaJaOdota(alku[i][0][0], alku[i][1][0], 5);
 		wait(0.5);
 		if(j != 0 ){
@@ -61,46 +65,53 @@ int main(){
 	while(true){
 		//Luo IP yhteyden ja lähettää dataa sen läpi.
 		l = sizeof(lahetys)/sizeof(lahetys[0]);
-		for(int i = 0; i < l; i++){
-			int j = lahetaJaOdota(lahetys[i][0][0], lahetys[i][1][0], 5);
-			wait(0.5);
+		for(int i = 0; i < l - 1; i++){
+			int j = lahetaJaOdota(lahetys[i][0][0], lahetys[i][1][0], 10);
+			wait(1);
 			if(j != 0 ){
 				pc.printf("Väärä vastaus.");
 				i--;
 			}
 		}
+		pc.printf("Varo vaaraa.");
 		
-		//pc.printf("\nValmis\n");
+		char viesti[] = {"GET /~tkorpela/jkaskitesti/vastaanotto.php?testi=%d HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032"};
+		sprintf(viesti, "GET /~tkorpela/jkaskitesti/vastaanotto.php?testi=%d&testiKaks=%d HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032", 65, 313);
+		
+		/*laheta("GET /~tkorpela/jkaskitesti/vastaanotto.php?yksi=");
+		laheta(1 + 0);
+		lahetaJaOdota("HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032", "SEND OK", 10);
+		*/
+		/*
+		char *viesti[200];
+		strcpy(&viesti, "GET /~tkorpela/jkaskitesti/vastaanotto.php?yksi=");
+		strcpy(&viesti, "1" );
+		stpcpy(&viesti, "HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032");
+		*/
+		
+		lahetaJaOdota(viesti, "SEND OK", 10);
+	
+		pc.printf("Vaara ohi.");
 	
 		lahetaLueLoop(true);
 	}
-	/*while(true){
-		if(pc.readable()){
-			led = !led;
-			while(pc.readable()){
-				gsm.putc(pc.getc());
-			}
-		}
-		if(gsm.readable()){
-			led = !led;
-			while(gsm.readable()){
-				pc.putc(gsm.getc());
-			}
-		}
-	}*/
+}
+
+void ledi(){
+	led = !led;
 }
 
 //Kaikki mitä pc:lle kirjoitetaan lähetetään GSM:lle ja päinvastoin.
 void lahetaLueLoop(bool alku){
 	while(true){
 		if(pc.readable()){
-			led = !led;
+			ledi();
 			while(pc.readable()){
 				gsm.putc(pc.getc());
 			}
 		}
 		if(gsm.readable()){
-			led = !led;
+			ledi();
 			while(gsm.readable()){
 				pc.putc(gsm.getc());
 			}
@@ -128,9 +139,9 @@ void lue(int aika){
 }
 
 void laheta(char *kasky){
-	gsm.puts(kasky);
+	gsm.printf(kasky);
 	gsm.puts("\r");
-	// pc.puts(kasky);
+	//pc.puts(kasky);
 	pc.puts("\n");
 }
 
