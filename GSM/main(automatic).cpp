@@ -14,22 +14,22 @@ Timer ajastin;
 
 char *alku[][2][200] = {
 	{{"AT"},			{"OK"}},		//Varmistetaan että modeemi on päällä
-	{{"AT+CPIN=0000"},	{"Call Ready"}},//Annetaan PIN koodi
 	{{"AT+CMEE=2"},		{"OK"}},		//Virhee kirjallisiksi
+	{{"AT+CPIN=0000"},	{"Call Ready"}},//Annetaan PIN koodi
 	{{"AT+CGREG?"},		{"+CGREG: 0,1"}},//Varmistetaan että on rekisteröitynyt koti verkkoon.
 	//{{"AT+CGATT=1"},	{"OK"}},		//Kiinnittää GPRS:n
 	//{{"AT+QIMODE=1"},	{"OK"}},		//Aktivoidaan PDP konteksti
 	{{"AT+CGACT=1,1"},	{"OK"}},		//Aktivoidaan PDP konteksti
 	{{"AT+QIREGAPP"},	{"OK"}},		//Käynnistetään TCP/IP protocolla
-	{{"AT+QIACT"},		{"OK"}},		//Akticoidaan TCP/IP
+	{{"AT+QIACT"},		{"OK"}},		//Aktivoidaan TCP/IP
 	{{"AT+QILOCIP"},	{"OK"}}			//Luetaan oma IP
 };
 
 char *lahetys[][2][200] = {
-	{{"AT+QIOPEN=\"TCP\",\"193.167.100.74\",80"}, {"CONNECT OK"}},
+	{{"AT+QIOPEN=\"TCP\",\"193.167.100.74\",80"}, {"CONNECT OK"}}, //Koulun IP
 	{{"AT+QISEND"}, {">"}},
-	{{"GET /~t5pyan00/indexvanha.html HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032"}, {"SEND OK"}}
-	//{{"GET /~tkorpela/jkaskitesti/vastaanotto.php?testi=SeToimii HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032"}, {"SEND OK"}}
+	//{{"GET /~t5pyan00/?viesti=GSM HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032"}, {"SEND OK"}}
+	{{"GET /~tkorpela/jkaskitesti/vastaanotto.php?testi=SeToimii2 HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032"}, {"SEND OK"}}
 };
 
 void ledi();
@@ -51,7 +51,7 @@ int main(){
 	for(int i = 0; i < l - 1; i++){
 		ledi();
 		int j = lahetaJaOdota(alku[i][0][0], alku[i][1][0], 5);
-		wait(0.5);
+		lue(1);
 		if(j != 0 ){
 			pc.printf("Väärä vastaus.");
 			i--;
@@ -62,38 +62,28 @@ int main(){
 	laheta(alku[l - 1][0][0]);
 	
 	lue(5);
+	
 	while(true){
 		//Luo IP yhteyden ja lähettää dataa sen läpi.
+		/*
 		l = sizeof(lahetys)/sizeof(lahetys[0]);
-		for(int i = 0; i < l - 1; i++){
+		for(int i = 0; i < l; i++){
 			int j = lahetaJaOdota(lahetys[i][0][0], lahetys[i][1][0], 10);
-			wait(1);
+			lue(1);
 			if(j != 0 ){
 				pc.printf("Väärä vastaus.");
 				i--;
 			}
-		}
-		pc.printf("Varo vaaraa.");
+		}*/
 		
-		char viesti[] = {"GET /~tkorpela/jkaskitesti/vastaanotto.php?testi=%d HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032"};
+		//Tapa millä saadaan yhdistettyä muuttujia char taulukkoon
+		/*char viesti[] = {"GET /~tkorpela/jkaskitesti/vastaanotto.php?testi=%d HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032"};
 		sprintf(viesti, "GET /~tkorpela/jkaskitesti/vastaanotto.php?testi=%d&testiKaks=%d HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032", 65, 313);
 		
-		/*laheta("GET /~tkorpela/jkaskitesti/vastaanotto.php?yksi=");
-		laheta(1 + 0);
-		lahetaJaOdota("HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032", "SEND OK", 10);
-		*/
-		/*
-		char *viesti[200];
-		strcpy(&viesti, "GET /~tkorpela/jkaskitesti/vastaanotto.php?yksi=");
-		strcpy(&viesti, "1" );
-		stpcpy(&viesti, "HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032");
-		*/
-		
-		lahetaJaOdota(viesti, "SEND OK", 10);
-	
-		pc.printf("Vaara ohi.");
+		lahetaJaOdota(viesti, "SEND OK", 10);*/
 	
 		lahetaLueLoop(true);
+		lue(1);
 	}
 }
 
@@ -117,6 +107,7 @@ void lahetaLueLoop(bool alku){
 			}
 		}
 		if(alku && !button){
+			ledi();
 			wait(0.5);
 			if(button)break;
 		}
@@ -130,7 +121,8 @@ void lue(int aika){
 			char c = gsm.getc();
 			pc.putc(c);
 		}
-		if(aika < ajastin.read()){
+		if(aika <= ajastin.read()){
+			//pc.printf("----------AIKA:%f----------", ajastin.read());
 			ajastin.stop();
 			ajastin.reset();
 			break;
