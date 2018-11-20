@@ -15,7 +15,7 @@
 				document.getElementById("ikkuna").src = "indexOL2.php?ID=" + id;
 			}
 			else{
-				document.getElementById("ikkuna").src = "indexOL2.php;
+				document.getElementById("ikkuna").src = "indexOL2.php";
 			}
 		}
 	</script>
