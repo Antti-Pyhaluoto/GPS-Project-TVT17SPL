@@ -1,4 +1,28 @@
-<!DOCTYPE HTML>
+<?php
+
+function openDatabase(){//Luodaan tietokanta yhteys ja palautetaan se.
+	$host="localhost";
+	$database="testi";
+	$username="sivu";
+	$password="sivu1234";
+	
+	try{
+		$con = new PDO("mysql:host=$host;dbname=$database", $username, $password);
+		$con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		
+		$con->exec("SET NAMES utf8");
+		
+		//echo "Yhteys toimii";
+		
+		return $con;
+	}
+	catch(PDOException $e){
+		echo "Ei yhteyttä: " . $e->getMessage();
+	}
+}
+
+function alku($Lon, $Lat){
+	echo '<!DOCTYPE HTML>
 <html>
 <head>
 	<meta charset="utf-8">
@@ -24,7 +48,7 @@
 			var mapnik         = new OpenLayers.Layer.OSM();
 			var fromProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
 			var toProjection   = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
-			var position       = new OpenLayers.LonLat(25.51198, 64.99891).transform( fromProjection, toProjection);
+			var position       = new OpenLayers.LonLat('. $Lon .',' . $Lat . ').transform( fromProjection, toProjection);
 			var zoom           = 15; 
 			
 			//Lisättään kartalle ulkonäkö(?) ja otetaan oletus arvot käyttöön.
@@ -33,11 +57,11 @@
 			
 			//Määritellään pisteet.
 			
-			var points = new Array(
-				new OpenLayers.Geometry.Point(25.50951, 64.99777).transform( fromProjection, toProjection),
-				new OpenLayers.Geometry.Point(25.5125, 64.998).transform( fromProjection, toProjection),
-				new OpenLayers.Geometry.Point(25.51564, 64.99843).transform( fromProjection, toProjection)
-			);
+			var points = new Array(';
+}
+function loppu(){
+	echo"
+	);
 			
 			/*
 			var points = new Array();
@@ -51,7 +75,7 @@
 				'strokeColor': '#000000'
 			});
 			// new vector graphic layer
-			var route = new OpenLayers.Layer.Vector("Route", {styleMap: style});
+			var route = new OpenLayers.Layer.Vector(\"Route\", {styleMap: style});
 
 			// Make line
 			var line = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.LineString(points));
@@ -64,8 +88,12 @@
 		}
 	</script>
 </head>
-<body onload="init();">
-<div id="basicMap"></div>
+<body onload=\"init();\">
+<div id=\"basicMap\"></div>
 
 </body>
 </html>
+	";
+}
+
+?>
