@@ -2,7 +2,7 @@
 #include <string.h>
 //#include "GSM.h"
 
-Serial gsm(D14, D15);
+Serial gsm(D8, D2);
 Serial pc(USBTX, USBRX);
 DigitalOut led(LED1);
 
