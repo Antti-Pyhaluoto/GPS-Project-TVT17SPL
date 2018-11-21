@@ -85,7 +85,8 @@ int main(){
 		}
 		
 		//Tapa millä saadaan yhdistettyä muuttujia char taulukkoon
-		sprintf(viesti, "GET /~t6heja02/lisaa.php?ID=%d&Aika=%d&Lat=%f&Lon=%f&HDOP=%f&Nopeus=%f HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032", ID, Aika, Lat, Lon, HDOP, Nopeus);
+		//sprintf(viesti, "GET /~t6heja02/lisaa.php?ID=%d&Aika=%d&Lat=%f&Lon=%f&HDOP=%f&Nopeus=%f HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032", ID, Aika, Lat, Lon, HDOP, Nopeus);
+		sprintf(viesti, "GET /~t6heja02/lisaa.php HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032");
 		
 		lahetaJaOdota(viesti, "SEND OK", 10);
 		
