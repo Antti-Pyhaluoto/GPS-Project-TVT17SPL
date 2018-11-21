@@ -39,6 +39,10 @@ void laheta(char *kasky);
 void lahetaJaLue(char *kasky, int aika);
 int lahetaJaOdota(char *kasky, char *vastaus, int aika);
 
+float Lat = 65.00033, Lon = 25.50952, HDOP = 2, Nopeus = 12;
+int Aika = 121412, ID = 3;
+char viesti[1000];// = {"GET /~t6heja02/vastaanotto.php?testi=%d HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032"};
+
 int main(){
 	pc.printf("Aloitus. GSM serial pass.\n");
 	
@@ -64,26 +68,30 @@ int main(){
 	lue(5);
 	
 	while(true){
+		
+		lahetaLueLoop(true);
+		lue(1);
+		
 		//Luo IP yhteyden ja lähettää dataa sen läpi.
-		/*
+		
 		l = sizeof(lahetys)/sizeof(lahetys[0]);
-		for(int i = 0; i < l; i++){
+		for(int i = 0; i < l - 1; i++){
 			int j = lahetaJaOdota(lahetys[i][0][0], lahetys[i][1][0], 10);
 			lue(1);
 			if(j != 0 ){
 				pc.printf("Väärä vastaus.");
 				i--;
 			}
-		}*/
+		}
 		
 		//Tapa millä saadaan yhdistettyä muuttujia char taulukkoon
-		/*char viesti[] = {"GET /~tkorpela/jkaskitesti/vastaanotto.php?testi=%d HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032"};
-		sprintf(viesti, "GET /~tkorpela/jkaskitesti/vastaanotto.php?testi=%d&testiKaks=%d HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032", 65, 313);
+		sprintf(viesti, "GET /~t6heja02/lisaa.php?ID=%d&Aika=%d&Lat=%f&Lon=%f&HDOP=%f&Nopeus=%f HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032", ID, Aika, Lat, Lon, HDOP, Nopeus);
 		
-		lahetaJaOdota(viesti, "SEND OK", 10);*/
+		lahetaJaOdota(viesti, "SEND OK", 10);
+		
+		
 	
-		lahetaLueLoop(true);
-		lue(1);
+		
 	}
 }
 
