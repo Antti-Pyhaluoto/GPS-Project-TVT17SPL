@@ -85,6 +85,9 @@ void GSM_Thread(){
 		}
 	}
 	
+	//Kysytään ID
+	
+	
 	while(true){
 		//Lähetetään tietyin väliajoin
 	}
