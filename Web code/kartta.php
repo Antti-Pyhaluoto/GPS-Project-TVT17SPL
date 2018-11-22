@@ -3,7 +3,7 @@ require "funktiot.php";
 
 try{
 	$con = openDatabase();
-	if($_GET['ID']){
+	if(isset($_GET['ID'])){
 		$kysely = $con->prepare("SELECT Aika, Lat, Lon, HDOP, Nopeus FROM Paikka WHERE ID = " . $_GET['ID'] . ";");
 		
 		$kysely->execute();

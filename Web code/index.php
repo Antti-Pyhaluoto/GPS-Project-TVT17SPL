@@ -6,17 +6,15 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
 	
 	<script>
 		function vaihdaIkkuna(){
 			var pudotus = document.getElementById("pudotus");
 			var id = pudotus.options[pudotus.selectedIndex].value;
-			if(id != 0){
-				document.getElementById("ikkuna").src = "indexOL2.php?ID=" + id;
-			}
-			else{
-				document.getElementById("ikkuna").src = "indexOL2.php";
-			}
+			
+			document.getElementById("ikkuna").src = "kartta.php?ID=" + id;
+			document.getElementById("ikkunaGraph").src = "kaavio.php?ID=" + id;
 		}
 	</script>
     
@@ -31,7 +29,7 @@
 		</div>
 	</div>
 	
-	<div class="row align-items-center justify-content-center">
+	<div class="row">
 		<div class="col-md-3"></div>
 		
 		<div class="col-md-2">
@@ -57,29 +55,28 @@
 				
 			?>
 			</select>
-		</div>
-		
-		<div class="col-md-2">
-			<button type="button" onclick="vaihdaIkkuna()">Valitse</button>
+			<button type="button" onclick="vaihdaIkkuna();">Valitse</button>
 		</div>
 		
 		<div class="col-md-2">
 			<button type="button">Live (joku päivä)</button>
 		</div>
 		
+		<div class="col-md-2">
+			<button type="button">Hallinta (joku päivä)</button>
+		</div>
+		
 		<div class="col-md-3"></div>
 	</div>
 	
     <div class="row">
-	  <div class="col-xs-6">
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur euismod ornare mi, vel ultrices dolor facilisis a. Sed est lorem, rhoncus et bibendum eget, iaculis id libero. Sed a porta purus. Duis fermentum erat sit amet arcu congue, sit amet porta odio gravida. Proin porta enim felis, vel gravida justo efficitur sit amet. Cras mollis porttitor augue, non mattis odio dictum non. Vivamus tempor vitae mi ut rhoncus. Praesent lacinia gravida gravida. Fusce porttitor velit at est porta facilisis. Etiam aliquet congue diam, vel dapibus massa mattis vitae. Aliquam a molestie urna. Mauris placerat tincidunt quam ac vestibulum. Curabitur quis.
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur euismod ornare mi, vel ultrices dolor facilisis a. Sed est lorem, rhoncus et bibendum eget, iaculis id libero. Sed a porta purus. Duis fermentum erat sit amet arcu congue, sit amet porta odio gravida. Proin porta enim felis, vel gravida justo efficitur sit amet. Cras mollis porttitor augue, non mattis odio dictum non. Vivamus tempor vitae mi ut rhoncus. Praesent lacinia gravida gravida. Fusce porttitor velit at est porta facilisis. Etiam aliquet congue diam, vel dapibus massa mattis vitae. Aliquam a molestie urna. Mauris placerat tincidunt quam ac vestibulum. Curabitur quis.
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur euismod ornare mi, vel ultrices dolor facilisis a. Sed est lorem, rhoncus et bibendum eget, iaculis id libero. Sed a porta purus. Duis fermentum erat sit amet arcu congue, sit amet porta odio gravida. Proin porta enim felis, vel gravida justo efficitur sit amet. Cras mollis porttitor augue, non mattis odio dictum non. Vivamus tempor vitae mi ut rhoncus. Praesent lacinia gravida gravida. Fusce porttitor velit at est porta facilisis. Etiam aliquet congue diam, vel dapibus massa mattis vitae. Aliquam a molestie urna. Mauris placerat tincidunt quam ac vestibulum. Curabitur quis.
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur euismod ornare mi, vel ultrices dolor facilisis a. Sed est lorem, rhoncus et bibendum eget, iaculis id libero. Sed a porta purus. Duis fermentum erat sit amet arcu congue, sit amet porta odio gravida. Proin porta enim felis, vel gravida justo efficitur sit amet. Cras mollis porttitor augue, non mattis odio dictum non. Vivamus tempor vitae mi ut rhoncus. Praesent lacinia gravida gravida. Fusce porttitor velit at est porta facilisis. Etiam aliquet congue diam, vel dapibus massa mattis vitae. Aliquam a molestie urna. Mauris placerat tincidunt quam ac vestibulum. Curabitur quis.
-		</p>
+	  <div class="col-md-6">
+	  
+		<iframe src="kaavio.php" style="height:500px;width:100%;" id="ikkunaGraph"></iframe>
+		
       </div>
-	  <div class="col-xs-6">
-		<iframe src="indexOL2.php" style="height:500px;width:100%;" id="ikkuna"></iframe>
+	  <div class="col-md-6">
+		<iframe src="kartta.php" style="height:500px;width:100%;" id="ikkuna"></iframe>
       </div>
     </div>
   </div>
