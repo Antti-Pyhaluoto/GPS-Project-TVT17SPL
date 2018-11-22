@@ -17,14 +17,29 @@ catch(PDOException $e){
 	die("Virhe:" . $e->getMessage());
 }
 
-if(isset($_GET['ID'])){
+if($_GET['ID'] > 0){
 		
 	$eka = 0;
 	$tunnit = 0;
 	$minuutit = 0;
 	$sekunnit = 0;
 	$vali = 0;
-
+	$nopeus = 0;
+	
+	$vanhaAika = 0;
+	
+	$mistaLat = 0;
+	$mistaLon = 0;
+	$etaisyys = 0;
+	$kokoEtaisyys = 0;
+	$lat = 0;
+	$lon = 0;
+	
+	$aikaEro = 0;
+	
+	$valiH = 0;
+	$valiM = 0;
+	
 	alkuKaavio();
 	
 	foreach($kaikki as $yksi){
@@ -38,14 +53,48 @@ if(isset($_GET['ID'])){
 		
 		if($eka == 0){//Pilkku kirjoitetaan aina paitsi ensimmäisellä kerralla.
 			$eka = 1;
+			
+			$eka = 1;
+			$mistaLat = deg2rad($yksi['Lat']);
+			$mistaLon = deg2rad($yksi['Lon']);
+			$vanhaAika = $yksi['Aika'];
+			
+			echo "{
+				x: moment('" . $tunnit . ":" . $minuutit . ":" . $sekunnit . "', 'HH:mm:ss'),
+				y: 0
+			}";
 		}
 		else{
-			echo ",";
+			$lat = deg2rad($yksi['Lat']);
+			$lon = deg2rad($yksi['Lon']);
+			$etaisyys = acos(sin($mistaLat)*sin($lat)+cos($mistaLat)*cos($lat)*cos($lon-$mistaLon)) * 6371000;
+			
+			$aikaEro = $yksi['Aika'] - $vanhaAika;
+			
+			if(floor($aikaEro / 10000) != 0){
+				$vali = floor($aikaEro / 10000);
+				$valiH = $vali * 60 * 60;
+			}
+			if(floor($aikaEro / 100) != 0){
+				$vali = floor($aikaEro / 100);
+				$valim = $vali * 60;
+			}
+			
+			$nopeus = $etaisyys / ($aikaEro + $valiH + $valiM);
+			
+			$valiH = 0;
+			$valiM = 0;
+			
+			echo ",{
+				x: moment('" . $tunnit . ":" . $minuutit . ":" . $sekunnit . "', 'HH:mm:ss'),
+				y: " . $nopeus . "
+			}";
+			$mistaLat = deg2rad($yksi['Lat']);
+			$mistaLon = deg2rad($yksi['Lon']);
+			$vanhaAika = $yksi['Aika'];
 		}
-		echo "{
-			x: moment('" . $tunnit . ":" . $minuutit . ":" . $sekunnit . "', 'HH:mm:ss'),
-			y: " . $yksi['Nopeus'] . "
-		}";
+		
+		
 	}
 	
 	vali();
