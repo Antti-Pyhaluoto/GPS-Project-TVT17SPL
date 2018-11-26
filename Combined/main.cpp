@@ -15,7 +15,7 @@ Timer ajastin;
 
 char *alku[][2][200] = {
 	{{"AT"},			{"OK"}},		//Varmistetaan että modeemi on päällä
-	{{"AT+CMEE=1"},		{"OK"}},		//Virhee kirjallisiksi
+	{{"AT+CMEE=2"},		{"OK"}},		//Virhee kirjallisiksi
 	{{"AT+CPIN=0000"},	{"Call Ready"}},//Annetaan PIN koodi
 	{{"AT+CGREG?"},		{"+CGREG: 0,1"}},//Varmistetaan että on rekisteröitynyt koti verkkoon.
 	{{"AT+CGACT=1,1"},	{"OK"}},		//Aktivoidaan PDP konteksti
@@ -51,7 +51,7 @@ int main(){
 	lahetaLueLoop(true);
 	pc.printf("Aloitetaan säikeet.\n");
 	gsmthread.start(callback(GSM_Thread));
-	gpsthread.start(callback(GPS_Thread));
+	//gpsthread.start(callback(GPS_Thread));
 	while(true){
 		wait(0.5);
 		led = !led;
@@ -71,16 +71,30 @@ void GSM_Thread(){
 			i--;
 		}
 	}
-	
+	wait(1);
 	//Kysytään uusi ID.
 	yhdistaTCP();
-		
-	lahetaJaOdota("GET /~t6heja02/lisaa.php HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032", "SEND OK", 10);
 	
+	lahetaJaOdota("GET /~t6heja02/lisaa.php HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032", "SEND OK", 10);
+	int a = 0, i = 0;
+	char c;
 	for(int i = 0; i < 300; i++){
-		gsmBuffer[i] = gsm.getc();
+		c = gsm.getc();
+		gsmBuffer[i] = c;
+		pc.putc(c);
+		pc.printf(" %d\n", a);
+		a++;
 	}
 	
+	while(gsm.readable()){
+		c = gsm.getc();
+		gsmBuffer[i] = c;
+		pc.putc(c);
+		pc.printf(" %d\n", i);
+		i++;
+	}
+	
+	pc.printf("---------------------Luettu.");
 	char *gsmToken;
 	strtok(gsmBuffer, "$");
 	gsmToken = strtok(NULL, "\n");
@@ -93,7 +107,7 @@ void GSM_Thread(){
 	}
 	
 	//Yhdistetään TCP/IP yhteys.
-	yhdistaTCP();	
+	//yhdistaTCP();	
 	
 	while(true){
 		//Lähetetään tietyin väliajoin
@@ -214,7 +228,7 @@ void GPS_Thread(){
 	//	pc.printf("token = %s\n", token);			//Altitude from sea level
 	//	int a12 = atoi(token);
 		
-		pc.printf("aika = %d\n longitude = %f\n Latitude = %f HDOP= %f\n\n\n\n",UTC, longitude, latitude, HDOP);
+		//pc.printf("aika = %d\n longitude = %f\n Latitude = %f HDOP= %f\n\n\n\n",UTC, longitude, latitude, HDOP);
 		
 		Lat = latitude;
 		Aika = UTC;
@@ -252,7 +266,7 @@ void lahetaLueLoop(bool alku){
 
 //Vaihto ehto wait fuktiolle mikä kuitenkin lukee tuloksia gsm:ltä.
 void lue(int aika){
-	pc.print("------------------------------------------------------");
+	pc.printf("------------------------------------------------------");
 	ajastin.start();
 	while(true){
 		if(gsm.readable()){
@@ -271,7 +285,8 @@ void lue(int aika){
 void laheta(char *kasky){
 	gsm.printf(kasky);
 	gsm.puts("\r");
-	//pc.puts("\n");
+	//pc.printf(kasky);
+	pc.puts("\n");
 }
 
 //Lähettää käskyn gsm:lle ja lukee vastauksia tietyn aikaa.
@@ -329,7 +344,7 @@ void yhdistaTCP(){
 	for(int i = 0; i < l; i++){
 		ledi();
 		int j = lahetaJaOdota(lahetys[i][0][0], lahetys[i][1][0], 5);
-		wait(0.5);
+		wait(0.1);
 		if(j != 0 ){
 			pc.printf("Väärä vastaus.TCP");
 			i--;
