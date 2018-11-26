@@ -137,7 +137,6 @@ function alku($Lon, $Lat){
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	
 	<title>GPS project</title>
 	<style type="text/css">
 		html, body, #basicMap {
@@ -168,6 +167,7 @@ function alku($Lon, $Lat){
 			
 			var points = new Array(';
 }
+
 function loppu(){
 	echo"
 	);
@@ -188,10 +188,6 @@ function loppu(){
 			// Add vector layer to map
 			map.addLayers([route]);
 			
-			var listOfPoints = new OpenLayers.Geometry.MultiPoint(points);
-			
-			//map.addLayer([listOfPoints]);
-			
 		}
 	</script>
 </head>
@@ -203,4 +199,93 @@ function loppu(){
 	";
 }
 
+function live($Lon, $Lat){
+	echo '<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>GPS project</title>
+	<style type="text/css">
+		html, body, #basicMap {
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		}
+		img.olTileImage {
+        max-width: none;
+    }
+	</style>
+	<script src="OpenLayers/OpenLayers.js"></script>
+	<script>
+		var size = new OpenLayers.Size(21,25);
+		var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+		var icon = new OpenLayers.Icon("https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.11/img/marker.png", size, offset);
+		
+		var fromProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
+		var toProjection   = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+		
+		var merkki = 0;
+		var marks = new OpenLayers.Layer.Markers("Markers");
+	
+		function init() {
+			//Luodaan kartta ja määritellään sille oletus sijainti ja oletus zoom.
+			map = new OpenLayers.Map("basicMap");
+			var mapnik         = new OpenLayers.Layer.OSM();
+			var position       = new OpenLayers.LonLat('. $Lon .',' . $Lat . ').transform( fromProjection, toProjection);
+			var zoom           = 15; 
+			
+			//Lisättään kartalle ulkonäkö(?) ja otetaan oletus arvot käyttöön.
+			map.addLayer(mapnik);
+			map.setCenter(position, zoom );
+			
+			merkki = new OpenLayers.Marker(position ,icon);
+			
+			map.addLayer(marks);
+			marks.addMarker(merkki);
+		}
+		function paivita(){
+			var xmlhttp = new XMLHttpRequest();
+			xmlhttp.onreadystatechange = function(){
+				if(this.readyState == 4 && this.status  == 200){
+					//Koodia millä luodaan uusi marker ja poistetaan vanha.
+					var txt = this.responseText;
+					var Lon = 0;
+					var Lat = 0;
+					
+					//Koodia mikä erottelee vastauksesta Lat ja Lon arvot
+					//this.responseText;
+					
+					var lonSij = txt.indexOf("Lon");
+					
+					var Lat = parseFloat(txt.slice(4,lonSij));
+					
+					var mista = lonSij + 4;
+					var mihin = txt.length;
+					
+					var Lon = parseFloat(txt.slice(mista, mihin));
+					
+					var merkkiuusi = new OpenLayers.Marker(new OpenLayers.LonLat(Lon, Lat).transform( fromProjection, toProjection),icon.clone());
+					marks.removeMarker(merkki);
+					marks.addMarker(merkkiuusi);
+					merkki = merkkiuusi;
+				}
+			}
+			xmlhttp.open("GET", "uusin.php");
+			xmlhttp.send();
+		}
+		
+		window.setInterval(function(){
+			paivita();
+		}, 5000);
+		
+	</script>
+</head>
+<body onload="init();">
+<div id="basicMap"></div>
+
+</body>
+</html>
+';
+}
 ?>

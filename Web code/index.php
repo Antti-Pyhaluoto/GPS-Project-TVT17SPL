@@ -16,6 +16,10 @@
 			document.getElementById("ikkuna").src = "kartta.php?ID=" + id;
 			document.getElementById("ikkunaGraph").src = "kaavio.php?ID=" + id;
 		}
+		function liveIkkuna(){
+			document.getElementById("ikkuna").src = "live.php";
+			document.getElementById("ikkunaGraph").src = "kaavio.php";
+		}
 	</script>
     
 	<title>GPS Project</title>
@@ -59,7 +63,7 @@
 		</div>
 		
 		<div class="col-md-2">
-			<button type="button">Live (joku päivä)</button>
+			<button type="button" onclick="liveIkkuna()">Live</button>
 		</div>
 		
 		<div class="col-md-2">
