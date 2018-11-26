@@ -16,7 +16,7 @@ int main()
     pc.printf("Käynnistys");
     
     
-    while(true) {
+		while(true) {
 		pc.printf("LOOPIN ALKU!\n\n\n");
 		char buffer[450];
 		for(int i = 0; i< 450; i++)
@@ -29,11 +29,9 @@ int main()
 		
 		}
 		
-		//pc.puts(buffer);
-		
-		
-		
-		//Haluttu input = "$GPGVA,111604.00,6500.02320,N,02530.55534,E,1,05,3.74,24.8,M,20.9,M,,*69";
+		//pc.puts(buffer);		//tulostaa bufferin raakadataa
+	
+		//Haluttu input = "$GPGGA,xxxxx.xx,xxxx.xxxxxx,x,xxxxxx.xxxxx,x,x,xx,x.xx,xx.x,x,xx.x,x,,*xx";
 		
 		char *token;		
 		token = strtok(buffer, "$");
@@ -47,7 +45,6 @@ int main()
 		bool loyty = false;
 		
 		token = strtok(NULL, "$");
-		//pc.printf("koko = %s\n", token);
 						
 		for(int i = 0; i < 5; i++)
 		{
@@ -69,7 +66,7 @@ int main()
 		char c = gsm.getc();
 		}
 		token = strtok(token, ",.");
-		//pc.printf("mikä tämä on? = %s\n", token);
+		//pc.printf(" = %s\n", token);
 			
 		token = strtok(NULL, ",.");
 		//pc.printf("token = %s\n", token);
@@ -100,7 +97,7 @@ int main()
 		//pc.printf("token = %s\n", token);
 		float a6 = atoi(token);						//2530.000000				
 		float LeveysKulma = a6/100;
-		LeveysKulma = floor(LeveysKulma);			//Pyöristää kahden desimaalin kokonaisluvuksi
+		LeveysKulma = floor(LeveysKulma);			//Pyöristää kahden desimaalin kokonaisluvuksi (floor=alaspäin pyöristys)
 		
 		float valivaihe = a6 - (LeveysKulma * 100);	// = 30 MINUUTIT
 		
@@ -114,29 +111,25 @@ int main()
 		
 		token = strtok(NULL, ",.");
 		//pc.printf("token = %s\n", token);			//EAST
-		int leveysSuunta = atoi(token);
-		
-		token = strtok(NULL, ",.");
-		//pc.printf("token = %s\n", token);
-		int a9 = atoi(token);
+	//	int leveysSuunta = atoi(token);
 		
 		token = strtok(NULL, ",.");
 	//	pc.printf("token = %s\n", token);
-		int a10 = atoi(token);
+	//	int a9 = atoi(token);						//fix quality
 		
 		token = strtok(NULL, ",.");
 	//	pc.printf("token = %s\n", token);
-		int HDOP = atoi(token);
+	//	int a10 = atoi(token);						//number of satellites
 		
 		token = strtok(NULL, ",.");
 	//	pc.printf("token = %s\n", token);
-		int a12 = atoi(token);
+		float HDOP = atoi(token);					//HDOP
+		
+		token = strtok(NULL, ",.");
+	//	pc.printf("token = %s\n", token);			//Altitude from sea level
+	//	int a12 = atoi(token);
 	 
-		
-		
-		//pc.printf("aika=%d\n nolla=%d\n todellinenKulma=%f\n todellisetMinuutit=%f\n Korkeus=%d\n LeveysKulma= %f\n a7=%f\n leveysSuunta=%d\n a9=%d a10=%d\n a11=%d; a12=%d a13=%d; a14=%d; a15=%d a16=%d; a17=%d; a18=%d; a19=d;\n", aika,nolla,todellinenKulma,todellisetMinuutit,Korkeus,LeveysKulma,a7,leveysSuunta,a9);
-		
-		pc.printf("aika = %d\n longitude = %f\n Latitude = %f HDOP= \n\n\n\n",aika, longitude, latitude, HDOP);
+		pc.printf("aika = %d\n longitude = %f\n Latitude = %f HDOP= %f\n\n\n\n",aika, longitude, latitude, HDOP);
 	}
 }
 
