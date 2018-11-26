@@ -5,16 +5,9 @@ Serial gsm(D8, D2);
 Serial gps(D14, D15);
 Serial pc(USBTX, USBRX);
 DigitalOut led(LED1);
-<<<<<<< HEAD
-Thread thread;
-DigitalIn button(USER_BUTTON);
-
-=======
 Thread gpsthread;
 Thread gsmthread;
 DigitalIn button(USER_BUTTON);
->>>>>>> 1fabfff7608a3a7ac80553b59cdaa0c5ae03ef22
-//DigitalIn button(USER_BUTTON);
 
 Timer ajastin;
 
@@ -54,23 +47,14 @@ void yhdistaTCP();
 
 
 int main(){
-<<<<<<< HEAD
 	pc.printf("Aloitus. GSM GPS yhdistelmä.\n");
 	lahetaLueLoop(true);
 	pc.printf("Aloitetaan säikeet.\n");
-	thread.start(callback(GSM_Thread));
-	thread.start(callback(GPS_Thread));
+	gsmthread.start(callback(GSM_Thread));
+	gpsthread.start(callback(GPS_Thread));
 	while(true){
 		wait(0.5);
-		ledi();
-=======
-	pc.printf("Aloitus. GSM GPS yhdistelmä.\nAloitetaan säikeet.\n");
-	//gsmthread.start(callback(GSM_Thread));
-	gpsthread.start(callback(GPS_Thread));
-	
-	while(true){
-		//led = !led;
->>>>>>> 1fabfff7608a3a7ac80553b59cdaa0c5ae03ef22
+		led = !led;
 	}
 }
 
@@ -80,17 +64,10 @@ void GSM_Thread(){
 	
 	//Käydään läpi alku komentosarja
 	for(int i = 0; i < l; i++){
-		ledi();
 		int j = lahetaJaOdota(alku[i][0][0], alku[i][1][0], 5);
-<<<<<<< HEAD
 		wait(0.5);
 		if(j != 0 ){
-			pc.printf("Väärä vastaus.Alku");
-=======
-		wait(1);
-		if(j != 0 ){
-			//pc.printf("Väärä vastaus.");
->>>>>>> 1fabfff7608a3a7ac80553b59cdaa0c5ae03ef22
+			//pc.printf("Väärä vastaus.Alku");
 			i--;
 		}
 	}
@@ -100,8 +77,6 @@ void GSM_Thread(){
 		
 	lahetaJaOdota("GET /~t6heja02/lisaa.php HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032", "SEND OK", 10);
 	
-	lue(5);
-	
 	for(int i = 0; i < 300; i++){
 		gsmBuffer[i] = gsm.getc();
 	}
@@ -110,7 +85,7 @@ void GSM_Thread(){
 	strtok(gsmBuffer, "$");
 	gsmToken = strtok(NULL, "\n");
 	ID = atoi(gsmToken) + 1;
-	pc.printf("Uusi ID:%d", ID);
+	pc.printf("\nUusi ID:%d\n", ID);
 	
 	//Odotetaan GPS.
 	while(true){
@@ -277,6 +252,7 @@ void lahetaLueLoop(bool alku){
 
 //Vaihto ehto wait fuktiolle mikä kuitenkin lukee tuloksia gsm:ltä.
 void lue(int aika){
+	pc.print("------------------------------------------------------");
 	ajastin.start();
 	while(true){
 		if(gsm.readable()){
@@ -295,12 +271,7 @@ void lue(int aika){
 void laheta(char *kasky){
 	gsm.printf(kasky);
 	gsm.puts("\r");
-<<<<<<< HEAD
-	//pc.puts(kasky);
-	pc.puts("\n");
-=======
 	//pc.puts("\n");
->>>>>>> 1fabfff7608a3a7ac80553b59cdaa0c5ae03ef22
 }
 
 //Lähettää käskyn gsm:lle ja lukee vastauksia tietyn aikaa.
@@ -352,7 +323,6 @@ int lahetaJaOdota(char *kasky, char *vastaus, int aika){
 		}
 	}
 }
-<<<<<<< HEAD
 
 void yhdistaTCP(){
 	int l = sizeof(lahetys)/sizeof(lahetys[0]);
@@ -366,5 +336,3 @@ void yhdistaTCP(){
 		}
 	}
 }
-=======
->>>>>>> 1fabfff7608a3a7ac80553b59cdaa0c5ae03ef22
