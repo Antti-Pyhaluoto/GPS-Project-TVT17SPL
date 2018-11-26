@@ -6,8 +6,9 @@ Serial gsm(D8, D2);
 Serial gps(D14, D15);
 Serial pc(USBTX, USBRX);
 DigitalOut led(LED1);
-Thread thread;
-
+Thread gpsthread;
+Thread gsmthread;
+DigitalIn button(USER_BUTTON);
 //DigitalIn button(USER_BUTTON);
 
 Timer ajastin;
@@ -33,7 +34,7 @@ char *lahetys[][2][200] = {
 };
 
 //Globaaleja muuttujia tiedon siirtämiseksi GPS:ltä GSM:lle.
-float Lat = 0.0, Lon = 0.0, HDOP = 0.0, Nopeus = 0.0;
+float Lat = 0.0, Lon = 0.0, oikeaHDOP = 0.0;
 int Aika = 0, ID = 0;
 char viesti[1000];// = {"GET /~t6heja02/vastaanotto.php?testi=%d HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032"};
 
@@ -49,10 +50,11 @@ int lahetaJaOdota(char *kasky, char *vastaus, int aika);
 
 int main(){
 	pc.printf("Aloitus. GSM GPS yhdistelmä.\nAloitetaan säikeet.\n");
-	thread.start(callback(GPS_Thread));
-	thread.start(callback(GSM_Thread));
+	//gsmthread.start(callback(GSM_Thread));
+	gpsthread.start(callback(GPS_Thread));
+	
 	while(true){
-		wait(1);
+		//led = !led;
 	}
 }
 
@@ -63,9 +65,9 @@ void GSM_Thread(){
 	for(int i = 0; i < l; i++){
 		ledi();
 		int j = lahetaJaOdota(alku[i][0][0], alku[i][1][0], 5);
-		lue(1);
+		wait(1);
 		if(j != 0 ){
-			pc.printf("Väärä vastaus.");
+			//pc.printf("Väärä vastaus.");
 			i--;
 		}
 	}
@@ -94,10 +96,130 @@ void GSM_Thread(){
 }
 
 void GPS_Thread(){
-	//GPS yhdistäminen
+		while(true) {
+		//pc.printf("LOOPIN ALKU!\n\n\n");
+		char buffer[460];
+		for(int i = 0; i< 450; i++)
+		{
+		
+		char c = gps.getc();
+		
+		buffer[i] = c;
+		
+		
+		}
+		
+		//pc.puts(buffer);		//tulostaa bufferin raakadataa
+	
+		//Haluttu input = "$GPGGA,xxxxx.xx,xxxx.xxxxxx,x,xxxxxx.xxxxx,x,x,xx,x.xx,xx.x,x,xx.x,x,,*xx";
+		
+		char *token;		
+		token = strtok(buffer, "$");
+		
+		//pc.printf("TYHJÄ = %s\n", token);
+			
+		char* paikannusTieto = {"GPGGA"};
+	
+		while (true){
+			
+		bool loyty = false;
+		
+		token = strtok(NULL, "$");
+						
+		for(int i = 0; i < 5; i++)
+		{
+			if (paikannusTieto[i] != token[i])
+			{
+				//pc.printf("Väärä merkki!\n");
+				loyty = true;
+				break;
+			}
+		}
+		if (!loyty){
+			
+		break;				//Takaisin loopin alkuun etsimään "GPGGA"
+		}
+
+		}
+		while (gps.readable())
+		{
+		char c = gps.getc();
+		}
+		token = strtok(token, ",.");
+		//pc.printf(" = %s\n", token);
+			
+		token = strtok(NULL, ",.");
+		//pc.printf("token = %s\n", token);
+		int fix = atoi(token);
+		int UTC = fix + 20000;
+		
+		token = strtok(NULL, ",.");
+		//pc.printf("token = %s\n", token);
+		int nolla = atoi(token);
+		
+		token = strtok(NULL, ",.");
+		//pc.printf("token = %s\n", token);
+		int kulma = (atoi(token));					//JAA 100
+		float todellinenKulma = kulma/100;			// 65 !!
+		
+		token = strtok(NULL, ",.");
+		//pc.printf("token = %s\n", token);
+		float minuutit = atoi(token);
+		float todellisetMinuutit = minuutit/100000;	//0.0232000
+		
+		float latitude = todellinenKulma + (todellisetMinuutit / 60);
+		
+		token = strtok(NULL, ",.");
+		//pc.printf("token = %s\n", token);
+		int Korkeus = atoi(token);
+		
+		token = strtok(NULL, ",.");
+		//pc.printf("token = %s\n", token);
+		float a6 = atoi(token);						//2530.000000				
+		float LeveysKulma = a6/100;
+		LeveysKulma = floor(LeveysKulma);			//Pyöristää kahden desimaalin kokonaisluvuksi (floor=alaspäin pyöristys)
+		
+		float valivaihe = a6 - (LeveysKulma * 100);	// = 30 MINUUTIT
+		
+		
+		token = strtok(NULL, ",.");
+		//pc.printf("token = %s\n", token);
+		float a7 = atoi(token);
+		float leveydenAika= a7/100000;				// 0,55534
+		
+		float longitude = LeveysKulma + (valivaihe + leveydenAika) / 60;
+		
+		token = strtok(NULL, ",.");
+		//pc.printf("token = %s\n", token);			//EAST
+	//	int leveysSuunta = atoi(token);
+		
+		token = strtok(NULL, ",.");
+	//	pc.printf("token = %s\n", token);
+	//	int a9 = atoi(token);						//fix quality
+		
+		token = strtok(NULL, ",.");
+	//	pc.printf("token = %s\n", token);
+	//	int a10 = atoi(token);						//number of satellites
+		
+		token = strtok(NULL, ",.");
+	//	pc.printf("token = %s\n", token);
+		float HDOP = atoi(token);					//HDOP
+		
+		token = strtok(NULL, ",.");
+	//	pc.printf("token = %s\n", token);			//Altitude from sea level
+	//	int a12 = atoi(token);
+		
+		pc.printf("aika = %d\n longitude = %f\n Latitude = %f HDOP= %f\n\n\n\n",UTC, longitude, latitude, HDOP);
+		
+		Lat = latitude;
+		Aika = UTC;
+		Lon = longitude;
+		oikeaHDOP = HDOP;
+	}
 }
+
 void ledi(){
-	led = !led;
+	//
 }
 
 //Kaikki mitä pc:lle kirjoitetaan lähetetään GSM:lle ja päinvastoin.
@@ -141,7 +263,7 @@ void lue(int aika){
 void laheta(char *kasky){
 	gsm.printf(kasky);
 	gsm.puts("\r");
-	pc.puts("\n");
+	//pc.puts("\n");
 }
 
 void lahetaJaLue(char *kasky, int aika){
