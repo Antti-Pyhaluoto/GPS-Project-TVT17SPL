@@ -108,11 +108,16 @@ int main(){
 	while(true){
 		pc.printf("\nAlku\n");
 		GPS_func();
+		if(Lon == 0.0 || Lat == 0.0){
+			printf("Virheellistä dataa/Heikko signaali");
+		}
+		else{
 		yhdistaTCP(0);//qiopen ja qisend
 		sprintf(viesti, "GET /~t6heja02/lisaa.php?ID=%d&Aika=%d&Lat=%f&Lon=%f&HDOP=%f HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032", ID, Aika, Lat, Lon, oikeaHDOP);
 		//lahetaJaOdota("AT+QISEND", ">", 5);
 		lahetaJaOdota(viesti, "SEND OK", 5);
 		lahetaJaOdota("", "CLOSED", 10);
+			}
 		pc.printf("\nOdotus\n");
 		wait(1);
 	}
