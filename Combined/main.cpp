@@ -107,17 +107,19 @@ int main(){
 	
 	while(true){
 		pc.printf("\nAlku\n");
+		ledi();
 		GPS_func();
 		if(floor(Lon) == 0.0 || floor(Lat) == 0.0){
 			printf("Virheellistä dataa/Heikko signaali");
 		}
 		else{
-		yhdistaTCP(0);//qiopen ja qisend
-		sprintf(viesti, "GET /~t6heja02/lisaa.php?ID=%d&Aika=%d&Lat=%f&Lon=%f&HDOP=%f HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032", ID, Aika, Lat, Lon, oikeaHDOP);
-		//lahetaJaOdota("AT+QISEND", ">", 5);
-		lahetaJaOdota(viesti, "SEND OK", 5);
-		lahetaJaOdota("", "CLOSED", 10);
-			}
+			yhdistaTCP(0);//qiopen ja qisend
+			sprintf(viesti, "GET /~t6heja02/lisaa.php?ID=%d&Aika=%d&Lat=%f&Lon=%f&HDOP=%f HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032", ID, Aika, Lat, Lon, oikeaHDOP);
+			//lahetaJaOdota("AT+QISEND", ">", 5);
+			lahetaJaOdota(viesti, "SEND OK", 5);
+			lahetaJaOdota("", "CLOSED", 10);
+		}
+		ledi();
 		pc.printf("\nOdotus\n");
 		wait(1);
 	}
@@ -433,7 +435,7 @@ void yhdistaTCP(int miinus){
 	for(int i = 0; i < l - miinus; i++){
 		int j = lahetaJaOdota(lahetys[i][0][0], lahetys[i][1][0], "ALREADY CONNECT", 5);
 		wait(0.1);
-		if(j != 0 ){
+		if(j == -1){
 			//pc.printf("Väärä vastaus.TCP");
 			wait(1);
 			i--;
