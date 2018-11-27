@@ -108,7 +108,7 @@ int main(){
 	while(true){
 		pc.printf("\nAlku\n");
 		GPS_func();
-		if(Lon == 0.0 || Lat == 0.0){
+		if(floor(Lon) == 0.0 || floor(Lat) == 0.0){
 			printf("Virheellistä dataa/Heikko signaali");
 		}
 		else{
