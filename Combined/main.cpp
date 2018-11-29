@@ -5,16 +5,16 @@
 Serial gsm(D8, D2);
 Serial gps(D14, D15);
 Serial pc(USBTX, USBRX);
-DigitalOut led(LED1);
-Thread gpsthread;
-Thread gsmthread;
+DigitalOut led(LED2);
+//Thread gpsthread;
+//Thread gsmthread;
 DigitalIn button(USER_BUTTON);
 
 Timer ajastin;
 
 //Alku käskyt
 
-char *alku[][2][200] = {
+char *alku[][2][50] = {
 	{{"AT"},			{"OK"}},		//Varmistetaan että modeemi on päällä
 	{{"AT+CMEE=2"},		{"OK"}},		//Virhee kirjallisiksi
 	{{"AT+CPIN=0000"},	{"Call Ready"}},//Annetaan PIN koodi
@@ -25,13 +25,13 @@ char *alku[][2][200] = {
 	{{"AT+QILOCIP"},	{"."}}			//Luetaan oma IP
 };
 
-char *lahetys[][2][200] = {
+char *lahetys[][2][50] = {
 	{{"AT+QIOPEN=\"TCP\",\"193.167.100.74\",80"}, {"CONNECT OK"}}, //Koulun IP
 	{{"AT+QISEND"}, {">"}}
 };
 
 //Globaaleja muuttujia tiedon siirtämiseksi GPS:ltä GSM:lle.
-float Lat = 0.0, Lon = 0.0, oikeaHDOP = 0.0;
+double Lat = 0.0, Lon = 0.0, oikeaHDOP = 0.0;
 int Aika = 0, ID = 0;
 char viesti[1000];
 char gsmBuffer[300];
@@ -75,15 +75,6 @@ int main(){
 	yhdistaTCP(0);
 	
 	lahetaJaOdota("GET /~t6heja02/lisaa.php HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032", "SEND OK", 10);
-	/*int a = 0, i = 0;
-	char c;
-	for(int i = 0; i < 300; i++){
-		c = gsm.getc();
-		gsmBuffer[i] = c;
-		pc.putc(c);
-		pc.printf(" %d\n", a);
-		a++;
-	}*/
 	
 	lueBufferiin(&gsmBuffer[0], "CLOSED", 3);
 	
@@ -193,14 +184,16 @@ void GPS_func(){
 		token = strtok(NULL, ",.");
 		//pc.printf("token = %s\n", token);
 		int kulma = (atoi(token));					//JAA 100
-		float todellinenKulma = kulma/100;			// 65 !!
+		double todellinenKulma = floor(kulma/100);	// 65 !!
 		
 		token = strtok(NULL, ",.");
 		//pc.printf("token = %s\n", token);
-		float minuutit = atoi(token);
-		float todellisetMinuutit = minuutit/100000;	//0.0232000
+		double minuutit = atoi(token);
+		double todellisetMinuutit = minuutit/100000;	//0.0232000
 		
-		float latitude = todellinenKulma + (todellisetMinuutit / 60);
+		todellisetMinuutit = (kulma - todellinenKulma * 100)+todellisetMinuutit;
+		
+		double latitude = todellinenKulma + (todellisetMinuutit / 60);
 		
 		token = strtok(NULL, ",.");
 		//pc.printf("token = %s\n", token);
@@ -208,19 +201,19 @@ void GPS_func(){
 		
 		token = strtok(NULL, ",.");
 		//pc.printf("token = %s\n", token);
-		float a6 = atoi(token);						//2530.000000				
-		float LeveysKulma = a6/100;
+		double a6 = atoi(token);						//2530.000000				
+		double LeveysKulma = a6/100;
 		LeveysKulma = floor(LeveysKulma);			//Pyöristää kahden desimaalin kokonaisluvuksi (floor=alaspäin pyöristys)
 		
-		float valivaihe = a6 - (LeveysKulma * 100);	// = 30 MINUUTIT
+		double valivaihe = a6 - (LeveysKulma * 100);	// = 30 MINUUTIT
 		
 		
 		token = strtok(NULL, ",.");
 		//pc.printf("token = %s\n", token);
-		float a7 = atoi(token);
-		float leveydenAika= a7/100000;				// 0,55534
+		double a7 = atoi(token);
+		double leveydenAika= a7/100000;				// 0,55534
 		
-		float longitude = LeveysKulma + (valivaihe + leveydenAika) / 60;
+		double longitude = LeveysKulma + (valivaihe + leveydenAika) / 60;
 		
 		token = strtok(NULL, ",.");
 		//pc.printf("token = %s\n", token);			//EAST
@@ -236,7 +229,7 @@ void GPS_func(){
 		
 		token = strtok(NULL, ",.");
 	//	pc.printf("token = %s\n", token);
-		float HDOP = atoi(token);					//HDOP
+		double HDOP = atoi(token);					//HDOP
 		
 		token = strtok(NULL, ",.");
 	//	pc.printf("token = %s\n", token);			//Altitude from sea level
