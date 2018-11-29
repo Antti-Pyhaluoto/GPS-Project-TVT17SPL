@@ -11,12 +11,13 @@ DigitalOut led(LED2);
 DigitalIn button(USER_BUTTON);
 
 Timer ajastin;
+Timer taajuusAja;
 
 //Alku käskyt
 
 char *alku[][2][50] = {
 	{{"AT"},			{"OK"}},		//Varmistetaan että modeemi on päällä
-	{{"AT+CMEE=2"},		{"OK"}},		//Virhee kirjallisiksi
+//	{{"AT+CMEE=2"},		{"OK"}},		//Virhee kirjallisiksi
 	{{"AT+CPIN=0000"},	{"Call Ready"}},//Annetaan PIN koodi
 	{{"AT+CGREG?"},		{"+CGREG: 0,1"}},//Varmistetaan että on rekisteröitynyt koti verkkoon.
 	{{"AT+CGACT=1,1"},	{"OK"}},		//Aktivoidaan PDP konteksti
@@ -32,11 +33,11 @@ char *lahetys[][2][50] = {
 
 //Globaaleja muuttujia tiedon siirtämiseksi GPS:ltä GSM:lle.
 double Lat = 0.0, Lon = 0.0, oikeaHDOP = 0.0;
-int Aika = 0, ID = 0;
+float kesto = 0, odotus = 0;
+int Aika = 0, ID = 0, taajuus = 3; //Aika muodossa hhmmss, taajuus kuinka monen sekunnin välein pitäisi lähettää paikkatieto.
 char viesti[1000];
 char gsmBuffer[300];
 
-void GSM_Thread();
 void GPS_func();
 void ledi();
 void lahetaLueLoop(bool alku);
@@ -55,21 +56,25 @@ int main(){
 	pc.printf("Aloitus. GSM GPS yhdistelmä.\n");
 	lahetaLueLoop(true);
 	
+	pc.printf("GSM yhdistäminen.\n");
 	int kumpi = lahetaJaOdota("AT+CPIN?", "READY", "SIM PIN", 3);
-	pc.printf("Kumpi:%d", kumpi);
+	//pc.printf("Kumpi:%d", kumpi);
 	if(kumpi == 1){
 		int l = sizeof(alku)/sizeof(alku[0]);
 		//Käydään läpi alku komentosarja
 		for(int i = 0; i < l; i++){
-			int j = lahetaJaOdota(alku[i][0][0], alku[i][1][0], 10 );
+			int j = lahetaJaOdota(alku[i][0][0], alku[i][1][0], 10);
 			wait(0.5);
 			if(j != 0 ){
-				//pc.printf("Väärä vastaus.Alku");
+				pc.printf("Fail %d:", i);
+				pc.printf(alku[i][0][0]);
+				pc.printf("\n");
 				i--;
 				wait(1);
 			}
 		}
 	}
+	pc.printf("GSM valmis.");
 	wait(1);
 	//Kysytään uusi ID.
 	yhdistaTCP(0);
@@ -98,8 +103,10 @@ int main(){
 	
 	while(true){
 		pc.printf("\nAlku\n");
+		taajuusAja.start();
 		ledi();
 		GPS_func();
+		pc.printf("OK Aika:%d\tLat:%f\tLon:%f\n", Aika, Lat, Lon);
 		if(floor(Lon) == 0.0 || floor(Lat) == 0.0){
 			printf("Virheellistä dataa/Heikko signaali");
 		}
@@ -108,16 +115,26 @@ int main(){
 			sprintf(viesti, "GET /~t6heja02/lisaa.php?ID=%d&Aika=%d&Lat=%f&Lon=%f&HDOP=%f HTTP/1.1\r\nHost: www.students.oamk.fi\r\nConnection: close\r\n\r\n\032", ID, Aika, Lat, Lon, oikeaHDOP);
 			//lahetaJaOdota("AT+QISEND", ">", 5);
 			lahetaJaOdota(viesti, "SEND OK", 5);
+			
+			/*
+			lueBufferiin(&gsmBuffer[0], "CLOSED", 3);
+			
+			strtok(gsmBuffer, "$");
+			gsmToken = strtok(NULL, "\n");
+			taajuus = atoi(gsmToken);
+			*/
+			
 			lahetaJaOdota("", "CLOSED", 10);
 		}
 		ledi();
-		pc.printf("\nOdotus\n");
-		wait(1);
+		kesto = taajuusAja.read();
+		taajuusAja.stop();
+		taajuusAja.reset();
+		odotus = taajuus - kesto;
+		if(odotus <= 0)odotus = 0;
+		pc.printf("\nOdotus %f sec.\n", odotus);
+		wait(odotus);
 	}
-	
-}
-
-void GSM_Thread(){	
 	
 }
 
@@ -289,7 +306,7 @@ void laheta(char *kasky){
 	gsm.printf(kasky);
 	gsm.puts("\r");
 	//pc.printf(kasky);
-	pc.puts("\n");
+	//pc.puts("\n");
 }
 
 //Lähettää käskyn gsm:lle ja lukee vastauksia tietyn aikaa.
@@ -321,7 +338,7 @@ int lahetaJaOdota(char *kasky, char *vastaus, int aika){
 	while(true){
 		if(gsm.readable()){
 			char c = gsm.getc();
-			pc.putc(c);
+			//pc.putc(c);
 			if(c == vastaus[indeksi]){
 				indeksi++;
 			}
@@ -353,7 +370,7 @@ int lahetaJaOdota(char *kasky, char *vastaus, char *toinen, int aika){
 	while(true){
 		if(gsm.readable()){
 			char c = gsm.getc();
-			pc.putc(c);
+			//pc.putc(c);
 			if(c == vastaus[indeksi]){
 				indeksi++;
 			}
@@ -400,7 +417,7 @@ int lueBufferiin(/*char *kasky, */char *buffer, char *vastaus, int aika){
 	while(true){
 		if(gsm.readable()){
 			char c = gsm.getc();
-			pc.putc(c);
+			//pc.putc(c);
 			buffer[j] = c;
 			j++;
 			if(c == vastaus[indeksi]){
