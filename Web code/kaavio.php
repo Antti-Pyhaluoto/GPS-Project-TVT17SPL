@@ -145,6 +145,20 @@ if($_GET['ID'] > 0){
 	loppuKaavio();
 }
 else{
-	echo"<p>Anna ID kaavion piirtämiseksi.</p>";
+	echo"<p>Anna ID kaavion piirtämiseksi.</p>
+	<p>Reitit 1 ja 2 dummy dataa.<br>
+	Reitit 3-9, 11-12 yksittäisiä pisteitä.<br>
+	Reitti 10, Afrikan matka. Ei sudoatettu nolla tuloksia.<br>
+	Reitti 13 ensimmäinen kävely - float muuttujilla.<br>
+	Reitti 17 paikallan.<br>
+	Reitti 18 ensimmäinen double muuttujilla.<br>
+	Reitit 19 ja 20 tehty USB virtapankin avulla. Molemmat kaatuivat.<br>
+	Reitti 21 paikallaa palaverin aikana.<br>
+	Reitti 22 kävely. Kaatui kesken jatkettiin lennosta.<br>
+	Reitti 23 jatkoa edellisestä.<br>
+	Reitti 24 kävely väärillä laskuilla. Kompailattiin kesken kaiken.<br>
+	Reitti 25 jatko edellisestä. Oikeilla laskelmilla.</p>
+	<p>Live painikkeella avautuu karttanäkymä, joka hakee tietokannasta 1 sekunnin välein viimeisemmän karttapisteen.</p>
+	";
 }
 ?>

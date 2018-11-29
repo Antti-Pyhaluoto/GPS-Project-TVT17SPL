@@ -25,6 +25,9 @@ function alkuKaavio(){
 	echo "<!DOCTYPE html>
 <html>
 <head>
+	<meta charset='utf-8'>
+	<meta name='viewport' content='width=device-width, initial-scale=1'>
+	<title>GPS project</title>
 </head>
 <script src='js/moment.min.js'></script>
 <script src='js/Chart.min.js'></script>
@@ -84,7 +87,7 @@ var myChart2 = new Chart(ctx2, {
 type: 'line',
 data: {
 	datasets: [{
-		label: 'Paikka / Väärä jokin',
+		label: 'Paikka',
 		fill: false,
 		borderColor: ['rgba(0,0,0,1)'],
 		borderWidth: 1,
@@ -277,7 +280,7 @@ function live($Lon, $Lat){
 		
 		window.setInterval(function(){
 			paivita();
-		}, 5000);
+		}, 1000);
 		
 	</script>
 </head>

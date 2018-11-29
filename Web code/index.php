@@ -6,7 +6,6 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
 	
 	<script>
 		function vaihdaIkkuna(){
@@ -19,6 +18,10 @@
 		function liveIkkuna(){
 			document.getElementById("ikkuna").src = "live.php";
 			document.getElementById("ikkunaGraph").src = "kaavio.php";
+		}
+		function hallintaIkkuna(){
+			document.getElementById("ikkuna").src = "live.php";
+			document.getElementById("ikkunaGraph").src = "hallinta.html";
 		}
 	</script>
     
@@ -67,20 +70,20 @@
 		</div>
 		
 		<div class="col-md-2">
-			<button type="button">Hallinta (joku päivä)</button>
+			<button type="button" onclick="hallintaIkkuna()">Hallinta (KESKEN)</button>
 		</div>
 		
 		<div class="col-md-3"></div>
 	</div>
 	
     <div class="row">
-	  <div class="col-md-6">
+	  <div class="col-xs-6">
 	  
-		<iframe src="kaavio.php" style="height:500px;width:100%;" id="ikkunaGraph"></iframe>
+		<iframe src="kaavio.php" style="height:600px;width:100%;" id="ikkunaGraph"></iframe>
 		
       </div>
-	  <div class="col-md-6">
-		<iframe src="kartta.php" style="height:500px;width:100%;" id="ikkuna"></iframe>
+	  <div class="col-xs-6">
+		<iframe src="kartta.php" style="height:600px;width:100%;" id="ikkuna"></iframe>
       </div>
     </div>
   </div>
