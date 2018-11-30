@@ -59,7 +59,7 @@ int main(){
 	pc.printf("GSM yhdistäminen.\n");
 	int kumpi = lahetaJaOdota("AT+CPIN?", "READY", "SIM PIN", 3);
 	//pc.printf("Kumpi:%d", kumpi);
-	if(kumpi == 1){
+	if(kumpi != 0){
 		int l = sizeof(alku)/sizeof(alku[0]);
 		//Käydään läpi alku komentosarja
 		for(int i = 0; i < l; i++){
@@ -89,7 +89,7 @@ int main(){
 	strtok(gsmBuffer, "$");
 	gsmToken = strtok(NULL, "\n");
 	ID = atoi(gsmToken) + 1;
-	pc.printf("\nUusi ID:%d\n", ID);
+	pc.printf("\nUusi ID:%d\nOdotetaan GPS.", ID);
 	
 	//Odotetaan GPS.
 	while(true){
@@ -99,14 +99,15 @@ int main(){
 		}
 	}
 	
-	//Yhdistetään TCP/IP yhteys.
+	pc.printf("GPS löyty. Odotetaan 5 sec.\n");
+	wait(5);
 	
 	while(true){
 		pc.printf("\nAlku\n");
 		taajuusAja.start();
 		ledi();
 		GPS_func();
-		pc.printf("OK Aika:%d\tLat:%f\tLon:%f\n", Aika, Lat, Lon);
+		pc.printf("OK Aika:%d\tLat:%f\tLon:%f\tHDOP:%f\n", Aika, Lat, Lon, oikeaHDOP);
 		if(floor(Lon) == 0.0 || floor(Lat) == 0.0){
 			printf("Virheellistä dataa/Heikko signaali");
 		}
@@ -116,15 +117,15 @@ int main(){
 			//lahetaJaOdota("AT+QISEND", ">", 5);
 			lahetaJaOdota(viesti, "SEND OK", 5);
 			
-			/*
+			
 			lueBufferiin(&gsmBuffer[0], "CLOSED", 3);
 			
 			strtok(gsmBuffer, "$");
 			gsmToken = strtok(NULL, "\n");
 			taajuus = atoi(gsmToken);
-			*/
 			
-			lahetaJaOdota("", "CLOSED", 10);
+			
+			//lahetaJaOdota("", "CLOSED", 10);
 		}
 		ledi();
 		kesto = taajuusAja.read();
