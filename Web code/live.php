@@ -1,7 +1,7 @@
 <?php
 require "funktiot.php";
 
- try{
+try{
 	$con = openDatabase();
 	$kysely = $con->prepare("CALL Uusin();");
 	
@@ -21,5 +21,5 @@ foreach($kaikki as $yksi){
 }
 
 live($keskiLon, $keskiLat); 
-
+$con = null;
 ?>

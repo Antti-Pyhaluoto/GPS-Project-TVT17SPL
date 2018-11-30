@@ -11,8 +11,9 @@ $kysely->closeCursor();
 $eka = 0;
 foreach($kaikki as $yksi){
 	if($eka == 0){
-		echo "Lat:" . $yksi['Lat'] . "Lon:" . $yksi['Lon'];
+		echo "Lat:" . $yksi['Lat'] . "Lon:" . $yksi['Lon'] . "Taajuus:" . $yksi['Taajuus'];
 		$eka = 1;
 	}
 }
+$conn = null;
 ?>

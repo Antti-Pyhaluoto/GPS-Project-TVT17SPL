@@ -48,5 +48,5 @@ if($_GET['ID']){
 	}
 }
 loppu();
-
+$con = null;
 ?>

@@ -49,7 +49,8 @@
 					$kysely->execute();
 					$kaikki = $kysely->fetchAll();
 					$kysely->closeCursor();
-					echo "<option value=\"0\">-</option>";
+					$con = null;
+					echo "<option value=\"0\">Info</option>";
 					foreach($kaikki as $yksi){
 						echo "<option value = \"" . $yksi['ID'] . "\">Reitti " . $yksi['ID'] . "</option>";
 					}
@@ -70,7 +71,7 @@
 		</div>
 		
 		<div class="col-md-2">
-			<button type="button" onclick="hallintaIkkuna()">Hallinta (KESKEN)</button>
+			<button type="button" onclick="hallintaIkkuna()">Hallinta</button>
 		</div>
 		
 		<div class="col-md-3"></div>

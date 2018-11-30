@@ -9,13 +9,16 @@
 	<script>
 	function hallitse(){
 		var taajuus = document.getElementById("hallinta").value;
-		/*
+		
 		var xmlhttp = new XMLHttpRequest();
 		xmlhttp.onreadystatechange = function(){
+			if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("vastaus").innerHTML = this.responseText;
+            }
 		}
 		xmlhttp.open("GET", "hallitse.php?taajuus=" + taajuus);
 		xmlhttp.send();
-		*/
+		
 	}
 	</script>
 	<title>GPS project</title>
@@ -24,11 +27,13 @@
 <div class="container-fluid">
 	<div class="row">
 		<h2 class="text-center">Hallinta</h2>
+		<p class="text-center">Lähetys taajuuden säätäminen.<br>Anna aika sekunteina, minkä välein lähetetään uusi paikkatieto.</p>
 	</div>
 	<div class="row">
 		<div class="col-xs-3"></div>
 		<div class="col-xs-3">
-			<input id="hallinta" type="number"></input>
+			<input id="hallinta" type="number"></input><br>
+			<p id="vastaus"></p>
 		</div>
 		<div class="col-xs-3">
 			<button type="button" onclick="hallitse()">Vahvista</button>

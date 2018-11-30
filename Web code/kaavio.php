@@ -82,6 +82,8 @@ if($_GET['ID'] > 0){
 			
 			$nopeus = $etaisyys / ($aikaEro + $valiH + $valiM);
 			
+			$nopeus = $nopeus * 3.6;
+			
 			$valiH = 0;
 			$valiM = 0;
 			
@@ -157,8 +159,14 @@ else{
 	Reitti 22 kävely. Kaatui kesken jatkettiin lennosta.<br>
 	Reitti 23 jatkoa edellisestä.<br>
 	Reitti 24 kävely väärillä laskuilla. Kompailattiin kesken kaiken.<br>
-	Reitti 25 jatko edellisestä. Oikeilla laskelmilla.</p>
+	Reitti 25 jatko edellisestä. Oikeilla laskelmilla.<br>
+	Reitti 26 istumista.<br>
+	Reitti 28 meno autolla keskustan postiin.<br>
+	Reitti 30 tulo postitsta autolla koululle.<br>
+	Reitit 31-33 tyhjiä. Testattiin hallittavuutta.<br>
+	Reitti 34 paikallaan toimiva testi halittavuudesta.</p>
 	<p>Live painikkeella avautuu karttanäkymä, joka hakee tietokannasta 1 sekunnin välein viimeisemmän karttapisteen.</p>
 	";
 }
+$con = null;
 ?>

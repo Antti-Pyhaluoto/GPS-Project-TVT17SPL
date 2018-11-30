@@ -77,7 +77,7 @@ function vali(){
 				display: true,
 				scaleLabel: {
 					display: true,
-					labelString: 'Speed | m/s'
+					labelString: 'Speed | km/h'
 				}
 			}]
 		}
