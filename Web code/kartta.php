@@ -4,7 +4,7 @@ require "funktiot.php";
 try{
 	$con = openDatabase();
 	if(isset($_GET['ID'])){
-		$kysely = $con->prepare("SELECT Aika, Lat, Lon, HDOP, Nopeus FROM Paikka WHERE ID = " . $_GET['ID'] . ";");
+		$kysely = $con->prepare("SELECT Aika, Lat, Lon FROM Paikka WHERE ID = " . $_GET['ID'] . ";");
 		
 		$kysely->execute();
 		$kaikki = $kysely->fetchAll();
@@ -36,7 +36,8 @@ if(isset($kaikki) && !empty($kaikki)){
 
 alku($keskiLon, $keskiLat);
 
-if($_GET['ID']){
+if(isset($_GET['ID'])){
+	echo "var points = new Array(";
 	foreach($kaikki as $yksi){
 		if($eka == 0){
 			$eka = 1;
@@ -46,6 +47,41 @@ if($_GET['ID']){
 		}
 		echo "new OpenLayers.Geometry.Point(". $yksi['Lon'] ."," . $yksi['Lat'] .").transform( fromProjection, toProjection)";
 	}
+	echo ");
+	var ajat = new Array(";
+	$eka = 0;
+	$tunnit = 0;
+	$vali = 0;
+	$minuutit = 0;
+	$sekunnit = 0;
+	foreach($kaikki as $yksi){
+		$tunnit = floor($yksi['Aika']/10000);
+		
+		$vali = $yksi['Aika'] - $tunnit * 10000;
+		$minuutit = floor($vali/100);
+		
+		$sekunnit = $vali - $minuutit * 100;
+		
+		if($tunnit < 10){
+			$tunnit = "0" . $tunnit;
+		}
+		if($minuutit < 10){
+			$minuutit = "0" . $minuutit;
+		}
+		if($sekunnit < 10){
+			$sekunnit = "0" . $sekunnit;
+		}
+		
+		if($eka == 0){
+			$eka = 1;
+		}
+		else{
+			echo ",";
+		}
+		echo "'" . $tunnit . ":" . $minuutit . ":" . $sekunnit . "'";
+	}
+	echo ");";
+	
 }
 loppu();
 $con = null;

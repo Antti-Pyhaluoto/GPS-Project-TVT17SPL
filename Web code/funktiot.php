@@ -21,7 +21,7 @@ function openDatabase(){//Luodaan tietokanta yhteys ja palautetaan se.
 	}
 }
 
-function alkuKaavio(){
+function alkuKaavio(){ //Kaavio.php
 	echo "<!DOCTYPE html>
 <html>
 <head>
@@ -50,7 +50,7 @@ var myChart = new Chart(ctx, {
 			data:[";
 }
 
-function vali(){
+function vali(){ //Kaavio.php
 	echo "]
         }]
     },
@@ -95,7 +95,7 @@ data: {
 		data:[";
 }
 
-function loppuKaavio(){
+function loppuKaavio(){ //Kaavio.php
 echo "]
 	}]
 },
@@ -134,7 +134,7 @@ options: {
 </html> ";
 }
 
-function alku($Lon, $Lat){
+function alku($Lon, $Lat){ //Kartt.php
 	echo '<!DOCTYPE HTML>
 <html>
 <head>
@@ -160,37 +160,58 @@ function alku($Lon, $Lat){
 			var fromProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
 			var toProjection   = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
 			var position       = new OpenLayers.LonLat('. $Lon .',' . $Lat . ').transform( fromProjection, toProjection);
-			var zoom           = 15; 
+			var zoom           = 14; 
 			
 			//Lisättään kartalle ulkonäkö(?) ja otetaan oletus arvot käyttöön.
 			map.addLayer(mapnik);
 			map.setCenter(position, zoom );
 			
-			//Määritellään pisteet.
-			
-			var points = new Array(';
+			//Määritellään pisteet ja ajat.
+			';
 }
 
-function loppu(){
+function loppu(){ //Kartta.php
 	echo"
-	);
 			var style = new OpenLayers.StyleMap({
 				'strokeWidth': 2,
-				'strokeColor': '#000000'
+				'strokeColor': '#444444'
 			});
 			
-			// new vector graphic layer
-			var route = new OpenLayers.Layer.Vector(\"Route\", {styleMap: style});
+			// Määritellään vectori taso viivalle.
+			var viiva = new OpenLayers.Layer.Vector(\"Route\", {styleMap: style});
 			
-			// Make line
+			// Luodaan viiva.
 			var line = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.LineString(points));
 			
 			// Add new feature to layer named by vector
-			route.addFeatures([line]);
+			viiva.addFeatures([line]);
 			
 			// Add vector layer to map
-			map.addLayers([route]);
+			map.addLayers([viiva]);
 			
+			// new vector graphic layer
+			var merkit = new OpenLayers.Layer.Vector(\"Route\");
+			
+			//Käydään points taulukko läpi lisäten jokaiselle pisteelle oma merkki kartalle millä on aikaleima.
+			for(var i = 0; i < points.length; i++){				
+				var paikka = points[i];
+				
+				var feature = new OpenLayers.Feature.Vector(
+					paikka,
+					{description: \"marker number \" + i} ,
+					{
+						externalGraphic: 'marker.png',
+						graphicHeight: 25,
+						graphicWidth: 21,
+						graphicXOffset: -12,
+						graphicYOffset: -25,
+						title: ajat[i]
+					}
+				);
+				merkit.addFeatures(feature);
+			}
+			// Lisätään merkit kartalle.
+			map.addLayer(merkit);
 		}
 	</script>
 </head>
@@ -202,7 +223,7 @@ function loppu(){
 	";
 }
 
-function live($Lon, $Lat){
+function live($Lon, $Lat){ //live.php
 	echo '<!DOCTYPE HTML>
 <html>
 <head>
@@ -223,7 +244,7 @@ function live($Lon, $Lat){
 	<script>
 		var size = new OpenLayers.Size(21,25);
 		var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
-		var icon = new OpenLayers.Icon("https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.11/img/marker.png", size, offset);
+		var icon = new OpenLayers.Icon("marker.png", size, offset);
 		
 		var fromProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
 		var toProjection   = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
@@ -246,6 +267,7 @@ function live($Lon, $Lat){
 			
 			map.addLayer(marks);
 			marks.addMarker(merkki);
+			//merkki.icon.imageDiv.title = "Live";
 		}
 		function paivita(){
 			var xmlhttp = new XMLHttpRequest();
