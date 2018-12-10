@@ -4,7 +4,7 @@ require "funktiot.php";
 try{
 	$con = openDatabase();
 	if(isset($_GET['ID'])){
-		$kysely = $con->prepare("SELECT Aika, Lat, Lon, HDOP, Nopeus FROM Paikka WHERE ID = " . $_GET['ID'] . " ORDER BY Aika;");
+		$kysely = $con->prepare("SELECT Aika, Lat, Lon, HDOP, Paiva FROM Paikka WHERE ID = " . $_GET['ID'] . " ORDER BY Aika;");
 		
 		$kysely->execute();
 		$kaikki = $kysely->fetchAll();
@@ -18,7 +18,6 @@ catch(PDOException $e){
 }
 
 if($_GET['ID'] > 0){
-		
 	$eka = 0;
 	$tunnit = 0;
 	$minuutit = 0;
@@ -27,6 +26,7 @@ if($_GET['ID'] > 0){
 	$nopeus = 0;
 	
 	$vanhaAika = 0;
+	$aikaSekunteina = 0;
 	
 	$mistaLat = 0;
 	$mistaLon = 0;
@@ -51,16 +51,16 @@ if($_GET['ID'] > 0){
 		
 		$sekunnit = $vali - $minuutit * 100;
 		
+		$aikaSekunteina =  $tunnit * 60 * 60 + $minuutit * 60 + $sekunnit;
+		
 		if($eka == 0){//Pilkku kirjoitetaan aina paitsi ensimmäisellä kerralla.
-			$eka = 1;
-			
 			$eka = 1;
 			$mistaLat = deg2rad($yksi['Lat']);
 			$mistaLon = deg2rad($yksi['Lon']);
-			$vanhaAika = $yksi['Aika'];
+			$vanhaAika = $aikaSekunteina;
 			
 			echo "{
-				x: moment('" . $tunnit . ":" . $minuutit . ":" . $sekunnit . "', 'HH:mm:ss'),
+				x: moment('" . $yksi['Paiva'] ." " . $tunnit . ":" . $minuutit . ":" . $sekunnit . "', 'YYYY-MM-DD HH:mm:ss'),
 				y: 0
 			}";
 		}
@@ -69,18 +69,9 @@ if($_GET['ID'] > 0){
 			$lon = deg2rad($yksi['Lon']);
 			$etaisyys = acos(sin($mistaLat)*sin($lat)+cos($mistaLat)*cos($lat)*cos($lon-$mistaLon)) * 6371000;
 			
-			$aikaEro = $yksi['Aika'] - $vanhaAika;
+			$aikaEro = $aikaSekunteina - $vanhaAika;
 			
-			if(floor($aikaEro / 10000) != 0){
-				$vali = floor($aikaEro / 10000);
-				$valiH = $vali * 60 * 60;
-			}
-			if(floor($aikaEro / 100) != 0){
-				$vali = floor($aikaEro / 100);
-				$valim = $vali * 60;
-			}
-			
-			$nopeus = $etaisyys / ($aikaEro + $valiH + $valiM);
+			$nopeus = $etaisyys / $aikaEro;
 			
 			$nopeus = $nopeus * 3.6;
 			
@@ -88,12 +79,12 @@ if($_GET['ID'] > 0){
 			$valiM = 0;
 			
 			echo ",{
-				x: moment('" . $tunnit . ":" . $minuutit . ":" . $sekunnit . "', 'HH:mm:ss'),
+				x: moment('" . $yksi['Paiva'] ." " . $tunnit . ":" . $minuutit . ":" . $sekunnit . "', 'YYYY-MM-DD HH:mm:ss'),
 				y: " . $nopeus . "
 			}";
 			$mistaLat = deg2rad($yksi['Lat']);
 			$mistaLon = deg2rad($yksi['Lon']);
-			$vanhaAika = $yksi['Aika'];
+			$vanhaAika = $aikaSekunteina;
 		}
 		
 		
@@ -123,7 +114,7 @@ if($_GET['ID'] > 0){
 			$mistaLon = deg2rad($yksi['Lon']);
 			
 			echo "{
-				x: moment('" . $tunnit . ":" . $minuutit . ":" . $sekunnit . "', 'HH:mm:ss'),
+				x: moment('" . $yksi['Paiva'] ." " . $tunnit . ":" . $minuutit . ":" . $sekunnit . "', 'YYYY-MM-DD HH:mm:ss'),
 				y: " . $kokoEtaisyys . "
 			}";
 		}
@@ -137,7 +128,7 @@ if($_GET['ID'] > 0){
 			//echo " " . $lat . "," . $lon . "," . $mistaLat . "," . $mistaLon . "," . $etaisyys . "," . $kokoEtaisyys . " <br> ";
 			
 			echo ",{
-				x: moment('" . $tunnit . ":" . $minuutit . ":" . $sekunnit . "', 'HH:mm:ss'),
+				x: moment('" . $yksi['Paiva'] ." " . $tunnit . ":" . $minuutit . ":" . $sekunnit . "', 'YYYY-MM-DD HH:mm:ss'),
 				y: " . $kokoEtaisyys . "
 			}";
 			$mistaLat = deg2rad($yksi['Lat']);
@@ -148,23 +139,10 @@ if($_GET['ID'] > 0){
 }
 else{
 	echo"<p>Anna ID kaavion piirtämiseksi.</p>
-	<p>Reitit 1 ja 2 dummy dataa.<br>
-	Reitit 3-9, 11-12 yksittäisiä pisteitä.<br>
-	Reitti 10, Afrikan matka. Ei sudoatettu nolla tuloksia.<br>
-	Reitti 13 ensimmäinen kävely - float muuttujilla.<br>
-	Reitti 17 paikallan.<br>
-	Reitti 18 ensimmäinen double muuttujilla.<br>
-	Reitit 19 ja 20 tehty USB virtapankin avulla. Molemmat kaatuivat.<br>
-	Reitti 21 paikallaa palaverin aikana.<br>
-	Reitti 22 kävely. Kaatui kesken jatkettiin lennosta.<br>
-	Reitti 23 jatkoa edellisestä.<br>
-	Reitti 24 kävely väärillä laskuilla. Kompailattiin kesken kaiken.<br>
-	Reitti 25 jatko edellisestä. Oikeilla laskelmilla.<br>
-	Reitti 26 istumista.<br>
-	Reitti 28 meno autolla keskustan postiin.<br>
-	Reitti 30 tulo postitsta autolla koululle.<br>
-	Reitit 31-33 tyhjiä. Testattiin hallittavuutta.<br>
-	Reitti 34 paikallaan toimiva testi halittavuudesta.</p>
+	<p>Reitit 1-3 paikallaan.<br>
+	Reitti 4 matka koululta Verkkokauppaan.<br>
+	Reitti 7 paluu koululle.<br>
+	Reitit 8-11 testejä paikallaan.</p>
 	<p>Live painikkeella avautuu karttanäkymä, joka hakee tietokannasta 1 sekunnin välein viimeisemmän karttapisteen.</p>
 	";
 }

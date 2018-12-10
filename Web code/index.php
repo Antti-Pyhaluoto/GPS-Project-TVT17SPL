@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="fi">
   <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,10 +17,10 @@
 		}
 		function liveIkkuna(){
 			document.getElementById("ikkuna").src = "live.php";
-			document.getElementById("ikkunaGraph").src = "kaavio.php";
+			document.getElementById("ikkunaGraph").src = "hallinta.html";
 		}
 		function hallintaIkkuna(){
-			document.getElementById("ikkuna").src = "live.php";
+			//document.getElementById("ikkuna").src = "live.php";
 			document.getElementById("ikkunaGraph").src = "hallinta.html";
 		}
 	</script>
@@ -33,13 +33,14 @@
     <div class="row">
 		<div class="col-xs-12">
 			<h1 class="text-center">GPS Project</h1>
+			<p class="text-center">Vanha hiukan huonompi sivu <a href='http://172.20.240.53/Vanha/'>löytyy täältä.</a></p>
 		</div>
 	</div>
 	
 	<div class="row">
 		<div class="col-md-3"></div>
 		
-		<div class="col-md-2">
+		<div class="col-md-2 text-center">
 			<select id="pudotus">
 			<?php
 				require "funktiot.php";
@@ -52,7 +53,8 @@
 					$con = null;
 					echo "<option value=\"0\">Info</option>";
 					foreach($kaikki as $yksi){
-						echo "<option value = \"" . $yksi['ID'] . "\">Reitti " . $yksi['ID'] . "</option>";
+						//echo "<option value = \"" . $yksi['ID'] . "\">Reitti " . $yksi['ID']."</option>";
+						echo "<option value = \"" . $yksi['ID'] . "\">Reitti " . $yksi['ID'] . " - " . $yksi['Paiva'] ."</option>";
 					}
 					
 				}catch(PDOException $e){
@@ -66,11 +68,11 @@
 			<button type="button" onclick="vaihdaIkkuna();">Valitse</button>
 		</div>
 		
-		<div class="col-md-2">
+		<div class="col-md-2 text-center">
 			<button type="button" onclick="liveIkkuna()">Live</button>
 		</div>
 		
-		<div class="col-md-2">
+		<div class="col-md-2 text-center">
 			<button type="button" onclick="hallintaIkkuna()">Hallinta</button>
 		</div>
 		

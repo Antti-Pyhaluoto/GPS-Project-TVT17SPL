@@ -4,7 +4,7 @@ require "funktiot.php";
 try{
 	$con = openDatabase();
 	if(isset($_GET['ID'])){
-		$kysely = $con->prepare("SELECT Aika, Lat, Lon FROM Paikka WHERE ID = " . $_GET['ID'] . ";");
+		$kysely = $con->prepare("SELECT Aika, Lat, Lon, Paiva FROM Paikka WHERE ID = " . $_GET['ID'] . ";");
 		
 		$kysely->execute();
 		$kaikki = $kysely->fetchAll();
@@ -78,7 +78,7 @@ if(isset($_GET['ID'])){
 		else{
 			echo ",";
 		}
-		echo "'" . $tunnit . ":" . $minuutit . ":" . $sekunnit . "'";
+		echo "'" . $yksi['Paiva'] . " " . $tunnit . ":" . $minuutit . ":" . $sekunnit . "'";
 	}
 	echo ");";
 	

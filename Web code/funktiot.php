@@ -2,7 +2,7 @@
 
 function openDatabase(){//Luodaan tietokanta yhteys ja palautetaan se.
 	$host="localhost";
-	$database="testi";
+	$database="Oikea";
 	$username="sivu";
 	$password="sivu1234";
 	
@@ -134,7 +134,7 @@ options: {
 </html> ";
 }
 
-function alku($Lon, $Lat){ //Kartt.php
+function alku($Lon, $Lat){ //Kartta.php
 	echo '<!DOCTYPE HTML>
 <html>
 <head>
