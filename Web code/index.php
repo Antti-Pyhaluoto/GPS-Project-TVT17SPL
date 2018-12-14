@@ -33,7 +33,7 @@
     <div class="row">
 		<div class="col-xs-12">
 			<h1 class="text-center">GPS Project</h1>
-			<p class="text-center">Vanha hiukan huonompi sivu <a href='http://172.20.240.53/Vanha/'>löytyy täältä.</a></p>
+			<p class="text-center">Old page <a href='http://172.20.240.53/Vanha/'> here.</a></p>
 		</div>
 	</div>
 	
@@ -54,7 +54,7 @@
 					echo "<option value=\"0\">Info</option>";
 					foreach($kaikki as $yksi){
 						//echo "<option value = \"" . $yksi['ID'] . "\">Reitti " . $yksi['ID']."</option>";
-						echo "<option value = \"" . $yksi['ID'] . "\">Reitti " . $yksi['ID'] . " - " . $yksi['Paiva'] ."</option>";
+						echo "<option value = \"" . $yksi['ID'] . "\">Route " . $yksi['ID'] . " - " . $yksi['Paiva'] ."</option>";
 					}
 					
 				}catch(PDOException $e){
@@ -65,7 +65,7 @@
 				
 			?>
 			</select>
-			<button type="button" onclick="vaihdaIkkuna();">Valitse</button>
+			<button type="button" onclick="vaihdaIkkuna();">Select</button>
 		</div>
 		
 		<div class="col-md-2 text-center">
@@ -73,7 +73,7 @@
 		</div>
 		
 		<div class="col-md-2 text-center">
-			<button type="button" onclick="hallintaIkkuna()">Hallinta</button>
+			<button type="button" onclick="hallintaIkkuna()">Control</button>
 		</div>
 		
 		<div class="col-md-3"></div>

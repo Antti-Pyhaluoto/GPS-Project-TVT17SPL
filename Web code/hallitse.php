@@ -11,7 +11,7 @@ try{
 	//$kysely->closeCursor();
 	$con = null;
 	
-	echo "Arvo muutettu " . $_GET['taajuus'] . " sekuntiin.";
+	echo "Frequency changed to " . $_GET['taajuus'] . " seconds.";
 }
 catch(PDOException $e){
 	echo "Tapahtui vihre.";

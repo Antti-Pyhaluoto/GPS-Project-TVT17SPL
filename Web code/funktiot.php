@@ -42,7 +42,7 @@ var myChart = new Chart(ctx, {
     type: 'line',
     data: {
 		datasets: [{
-            label: 'Nopeus',
+            label: 'Speed',
 			fill: false,
             borderColor: ['rgba(0,0,0,1)'],
             borderWidth: 1,
@@ -87,7 +87,7 @@ var myChart2 = new Chart(ctx2, {
 type: 'line',
 data: {
 	datasets: [{
-		label: 'Paikka',
+		label: 'Distance traveled',
 		fill: false,
 		borderColor: ['rgba(0,0,0,1)'],
 		borderWidth: 1,

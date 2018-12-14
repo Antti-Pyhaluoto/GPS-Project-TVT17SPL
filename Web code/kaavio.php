@@ -138,12 +138,22 @@ if($_GET['ID'] > 0){
 	loppuKaavio();
 }
 else{
-	echo"<p>Anna ID kaavion piirtämiseksi.</p>
-	<p>Reitit 1-3 paikallaan.<br>
+	/*echo"<p>Anna ID kaavion piirtämiseksi.</p>
+	<p>Reitit 1, 3 paikallaan.<br>
 	Reitti 4 matka koululta Verkkokauppaan.<br>
 	Reitti 7 paluu koululle.<br>
 	Reitit 8-11 testejä paikallaan.</p>
 	<p>Live painikkeella avautuu karttanäkymä, joka hakee tietokannasta 1 sekunnin välein viimeisemmän karttapisteen.</p>
+	";*/
+	echo "<p>Give ID to select route.</p>
+	<p>
+	Routes 1, 3 stationary.<br>
+	Route 2 update frequency test.<br>
+	Route 4 trip from school to Verkkokauppa.<br>
+	Route 7 return to school.<br>
+	Routes 8-32 stationary tests.
+	</p>
+	<p>Live button opens a map view that displays the most recent loction point and refreshes every second.</p>
 	";
 }
 $con = null;
